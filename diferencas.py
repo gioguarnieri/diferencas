@@ -4,6 +4,7 @@
 import numpy as np
 import sys
 
+
 #######################################################################
 
 
@@ -43,7 +44,7 @@ def CalculoDet(x):
 def Substitui(x,resp2):
  y=resp2
  for i in xrange(n-1,-1,-1):
-  j=n-1
+  j=n-2
   while (j>i):
    y[i]=y[i]-x.item(i,j)*y[j]
    j=j-1
@@ -67,7 +68,7 @@ def FazTudo(x,resp):
  y=Substitui(x,resp2)
  simply=[ round(elem,2) for elem in y ]
  w=Coeficientes(z,y)
- return simply
+ return y
 
 ##################################################################################
 
@@ -104,13 +105,12 @@ yfim=-0.1
 xini=0
 xfim=np.pi/2.
 n=N=9
-h=(xfim-xini)/float(N+2)
+h=(xfim-xini)/float(N+1)
 y=[yini]
 x=[xini]
 
 for i in xrange(0,N+1):
  x.append(x[-1]+h)
-print len(x)
 
 mat,vet=montamatriz(x,y)
 
