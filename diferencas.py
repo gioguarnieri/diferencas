@@ -17,12 +17,6 @@ def Escalona(x,resp):
  op=0
  for tt in xrange(0, n):
   for t in xrange(tt+1,n):
-   #if abs(x.item(tt,tt))<abs(x.item(t,tt)):
-   # moddet=moddet+1
-   # y=np.copy(x[tt])
-   # x[tt]=np.copy(x[t])
-   # x[t]=np.copy(y)
-   op=op+2+n
    lamda.append(x.item(t,tt)/x.item(tt,tt))
    resp2[t]=resp2[t]-lamda[-1]*resp2[tt]
    x[t]=np.copy(x[t]-lamda[-1]*x[tt])
@@ -72,6 +66,8 @@ def FazTudo(x,resp):
 
 ##################################################################################
 
+def solu(x):
+ return -0.1*(np.sin(x)+3*np.cos(x))
 
 def p(x):
  return 1
@@ -86,7 +82,7 @@ def montamatriz(x,y):
 
  mat.itemset((0,0), 2+h**2*q(x[1]))
  mat.itemset((0,1), -1+h/2*p(x[1]))
- vet=[h**2*r(x[1])+(-1-h/2*p(x[1]))*y[0]]
+ vet=[-(h**2*r(x[1])+(-1-h/2*p(x[1]))*yini)]
  mat.itemset((N-1,N-1), 2+h**2*q(x[N]))
  mat.itemset((N-1,N-2), -1+h/2*p(x[N]))
 
@@ -108,9 +104,10 @@ n=N=9
 h=(xfim-xini)/float(N+1)
 y=[yini]
 x=[xini]
-
+sol=[solu(xini)]
 for i in xrange(0,N+1):
  x.append(x[-1]+h)
+ sol.append(solu(x[-1]))
 
 mat,vet=montamatriz(x,y)
 
@@ -121,12 +118,12 @@ mat,vet=montamatriz(x,y)
 # print '\n'
 #
 #print "vet:"
-#for i in xrange(0,N):
-# print str(vet[i])+'\n'
+for i in xrange(0,N):
+ print str(vet[i])+'\n'
 aux=FazTudo(mat,vet)
-for i in xrange(0,9):
+for i in xrange(0,N):
  y.append(aux[i])
 y.append(yfim)
 
-for i,j in zip(x,y):
- print i,j
+for i,j,k in zip(x,y,sol):
+ print i,j,k
