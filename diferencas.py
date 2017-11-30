@@ -9,7 +9,6 @@ import sys
 
 
 def Escalona(x,resp):
- lu=np.zeros((n+1,n+1), float)
  resp2=np.zeros(n, float)
  resp2=resp
  lamda=[]
@@ -17,19 +16,10 @@ def Escalona(x,resp):
  op=0
  for tt in xrange(0, n):
   for t in xrange(tt+1,n):
-   #if abs(x.item(tt,tt))<abs(x.item(t,tt)):
-   # moddet=moddet+1
-   # y=np.copy(x[tt])
-   # x[tt]=np.copy(x[t])
-   # x[t]=np.copy(y)
-   op=op+2+n
    lamda.append(x.item(t,tt)/x.item(tt,tt))
    resp2[t]=resp2[t]-lamda[-1]*resp2[tt]
    x[t]=np.copy(x[t]-lamda[-1]*x[tt])
-   lu.itemset((t,tt),lamda[-1])
- for i in xrange(0,n+1):
-  lu.itemset((i,i),1)
- return x,lamda,op,resp2,lu
+ return x,lamda,resp2
 
 
 
@@ -42,9 +32,9 @@ def CalculoDet(x):
 
 
 def Substitui(x,resp2):
- y=resp2
+ y=np.copy(resp2)
  for i in xrange(n-1,-1,-1):
-  j=n-2
+  j=n-1
   while (j>i):
    y[i]=y[i]-x.item(i,j)*y[j]
    j=j-1
@@ -63,7 +53,12 @@ def FazTudo(x,resp):
  z=np.copy(x)
  n=len(x)+1
  moddet=0
- x,l,op,resp2,lu=Escalona(x,resp)
+ x,l,resp2=Escalona(x,resp)
+ #print "mat:"
+ #for i in xrange(0,N):
+ # for j in xrange(0,N):
+ #  print '{:4}'.format(mat[i][j]),
+ # print '\n'
  det=CalculoDet(x)
  y=Substitui(x,resp2)
  simply=[ round(elem,2) for elem in y ]
@@ -72,6 +67,8 @@ def FazTudo(x,resp):
 
 ##################################################################################
 
+def solu(x):
+ return -0.1*(np.sin(x)+3*np.cos(x))
 
 def p(x):
  return 1
@@ -86,17 +83,15 @@ def montamatriz(x,y):
 
  mat.itemset((0,0), 2+h**2*q(x[1]))
  mat.itemset((0,1), -1+h/2*p(x[1]))
- vet=[h**2*r(x[1])+(-1-h/2*p(x[1]))*y[0]]
+ vet=[-h**2*r(x[1])+(-1-h/2*p(x[1]))*yini]
  mat.itemset((N-1,N-1), 2+h**2*q(x[N]))
  mat.itemset((N-1,N-2), -1+h/2*p(x[N]))
-
  for i in xrange(1,N-1):
-  mat.itemset((i,i-1), -1-h/2*p(x[i]))
-  mat.itemset((i,i), 2+h**2*q(x[i]))
-  mat.itemset((i,i+1), -1+h/2*p(x[i]))
+  mat.itemset((i,i-1), -1-h/2*p(x[i+1]))
+  mat.itemset((i,i), 2+h**2*q(x[i+1]))
+  mat.itemset((i,i+1), -1+h/2*p(x[i+1]))
   vet.append(-h**2*r(x[i]))
-
- vet.append(h**2*r(x[N-1])+(-1-h/2*p(x[N-1]))*yfim)
+ vet.append(-h**2*r(x[N-1])+(-1-h/2*p(x[N-1]))*yfim)
  return mat, vet
  
 
@@ -105,28 +100,31 @@ yfim=-0.1
 xini=0
 xfim=np.pi/2.
 n=N=9
-h=(xfim-xini)/float(N+1)
+h=(xfim-xini)/float(N)
 y=[yini]
 x=[xini]
+sol=[solu(xini)]
 
-for i in xrange(0,N+1):
- x.append(x[-1]+h)
+for i in xrange(1,N+1):
+ x.append(x[i-1]+h)
+ sol.append(solu(x[i]))
 
 mat,vet=montamatriz(x,y)
 
-#print "mat:"
-#for i in xrange(0,N):
-# for j in xrange(0,N):
-#  print '{:4}'.format(mat[i][j]),
-# print '\n'
-#
-#print "vet:"
-#for i in xrange(0,N):
-# print str(vet[i])+'\n'
+
+print "mat:"
+for i in xrange(0,N):
+ for j in xrange(0,N):
+  print '{:4}'.format(mat[i][j]),
+ print '\n'
+
+print "vet:"
+for i in xrange(0,N):
+ print str(vet[i])+'\n'
 aux=FazTudo(mat,vet)
 for i in xrange(0,9):
  y.append(aux[i])
 y.append(yfim)
 
-for i,j in zip(x,y):
- print i,j
+for i,j,k in zip(x,y,sol):
+ print i,j,k
